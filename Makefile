@@ -2,12 +2,13 @@
 CC:= g++
 FLAGS:= -Iinclude -Wall -Wextra -pedantic -std=c++17
 
-INC:= include/
 SRC:= sources/
 OBJ:= build/
 
-OBJECTS:= $(OBJ)database.o $(OBJ)column.o $(OBJ)table.o
-SOURCES:= $(SRC)database.cpp $(SRC)column.cpp $(SRC)table.cpp $(SRC)main.cpp
+OBJECTS:= $(OBJ)database.o $(OBJ)column.o $(OBJ)table.o $(OBJ)bitmap.o
+SOURCES:= $(SRC)*.cpp
+
+$(shell mkdir -p $(OBJ))
 
 all:output
 
