@@ -1,20 +1,22 @@
-# -- Makefile --
-
+# Great Makefile
 CC:= g++
-FLAGS:= -idirafter Headers/
+FLAGS:= -Iinclude -Wall -Wextra -pedantic -std=c++17
 
-HED:= Headers/
-SRC:= Sources/
-OBJ:= Object_files/
+INC:= include/
+SRC:= sources/
+OBJ:= build/
 
-output: $(OBJ)main.o $(OBJ)sup.o
-	$(CC) $(FLAGS) $(SRC)main.cpp $(SRC)sup.cpp -o output.exe
+OBJECTS:= $(OBJ)database.o $(OBJ)column.o $(OBJ)table.o
+SOURCES:= $(SRC)database.cpp $(SRC)column.cpp $(SRC)table.cpp $(SRC)main.cpp
 
-$(OBJ)main.o: $(SRC)main.cpp
-	$(CC) $(FLAGS) -c $(SRC)main.cpp -o $(OBJ)main.o
+all:output
 
-$(OBJ)sup.o: $(SRC)sup.cpp $(HED)sup.h
-	$(CC) $(FLAGS) -c $(SRC)sup.cpp -o $(OBJ)sup.o
+output: $(OBJECTS)
+	$(CC) $(FLAGS) $(SOURCES) -o $@.exe
 
+$(OBJ)%.o: $(SRC)%.cpp
+	$(CC) -c $(FLAGS) $< -o $@
+
+.PHONY: clean
 clean:
 	rm $(OBJ)*.o *.exe

@@ -1,11 +1,8 @@
-#include "sup.h"
+#include "database.h"
+#include "table.h"
+#include "column.h"
 
-using namespace std;
- 
 int main()
 {
-    sup s;
-    s.work();
-
     return 0;
 }
