@@ -1,7 +1,7 @@
 #ifndef TBL_H
 #define TBL_H
 
-class table{
+class Table{
 public:
 	
 };

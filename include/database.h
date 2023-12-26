@@ -1,7 +1,7 @@
 #ifndef DBA_H
 #define DBA_H
 
-class database{
+class Database{
 public:
 	void work();
 };

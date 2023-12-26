@@ -3,7 +3,7 @@
 
 #include <cstdint>
 
-class bitmap{
+class Bitmap{
 private:
     uint8_t size;
     int* array;

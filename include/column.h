@@ -3,7 +3,7 @@
 
 #include <cstdint>
 
-class column{
+class Column{
 public:
     char name[20];
 	uint8_t type;
