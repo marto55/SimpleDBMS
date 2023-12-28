@@ -2,7 +2,6 @@
 #include "table.h"
 #include "column.h"
 #include "bitmap.h"
-#include "input_reader.h"
 
 #include <iostream>
 

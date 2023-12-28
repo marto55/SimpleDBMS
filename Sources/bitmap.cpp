@@ -26,3 +26,7 @@ bool Bitmap::test(int index){
 void Bitmap::flip(int index){
     array[index/NUMBER_OF_BITS] ^= (1 << (index%NUMBER_OF_BITS));
 }
+
+Bitmap::~Bitmap(){
+    delete[] array;
+}
