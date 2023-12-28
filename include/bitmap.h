@@ -13,6 +13,8 @@ public:
     void reset(int index);
     bool test(int index);
     void flip(int index);
+
+    ~Bitmap();
 };
 
 #endif // BST_H
