@@ -10,8 +10,8 @@ using namespace std;
 
 int main()
 {
-    Input_reader r;
-    r.start();
+    Database db;
+    db.read_input();
 
     return 0;
 }
