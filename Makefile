@@ -5,7 +5,7 @@ FLAGS:= -Iinclude -Wall -Wextra -pedantic -std=c++17
 SRC:= sources/
 OBJ:= build/
 
-OBJECTS:= $(OBJ)database.o $(OBJ)column.o $(OBJ)table.o $(OBJ)bitmap.o $(OBJ)hash_functions.o $(OBJ)memory_chunk.o $(OBJ)memory_functions.o
+OBJECTS:= $(OBJ)database.o $(OBJ)column.o $(OBJ)table.o $(OBJ)bitmap.o $(OBJ)hash_functions.o
 SOURCES:= $(SRC)*.cpp
 
 $(shell mkdir -p $(OBJ))

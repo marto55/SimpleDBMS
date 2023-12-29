@@ -3,10 +3,12 @@
 
 #include <cstdint>
 
+#define COLUMN_SIZE_IN_BYTES 21
+
 class Column{
 public:
     char name[20];
-	uint8_t type;
+	char type;
 };
 
 #endif // COL_H

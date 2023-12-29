@@ -1,22 +1,48 @@
+#include <bits/stdc++.h>
+#include <cstring>
+
 #include "Bitmap.h"
-#include <bits/stdc++.h> 
+#include "constants.h"
 
-using namespace std; 
+using namespace std;
 
-#define NUMBER_OF_BITS (8 * sizeof(unsigned int))
-
-void Bitmap::init(int size){
-    this->size = size;
-    array = new int[size];
-    memset(array, 0, size);
+void Bitmap::init(char values[MEMORY_MAP_SIZE_IN_BYTES], int offs){
+    offset = offs;
+    for(int i =0; i<10; i++){
+        array[i] = values[i];
+    }
 }
 
 void Bitmap::set(int index){
     array[index/NUMBER_OF_BITS] |= (1 << (index%NUMBER_OF_BITS));
+
+    fstream file;
+    file.open(DATA_FILE_NAME, ios::out | ios::binary);
+    if (!file.is_open()){
+        // signal to the user if the file coudn't be created
+        cout << "cannot open file" << DATA_FILE_NAME << endl;
+    }else{
+        // update bitmap in memory too
+        file.seekp(offset, ios::beg);
+        file.write(array, sizeof(array));
+    }
+    file.close();
 }
 
 void Bitmap::reset(int index){
     array[index/NUMBER_OF_BITS] &= ~(1 << (index%NUMBER_OF_BITS));
+
+    fstream file;
+    file.open(DATA_FILE_NAME, ios::out | ios::binary);
+    if (!file.is_open()){
+        // signal to the user if the file coudn't be created
+        cout << "cannot open file" << DATA_FILE_NAME << endl;
+    }else{
+        // update bitmap in memory too
+        file.seekp(offset, ios::beg);
+        file.write(array, sizeof(array));
+    }
+    file.close();
 }
 
 bool Bitmap::test(int index){
@@ -25,8 +51,26 @@ bool Bitmap::test(int index){
 
 void Bitmap::flip(int index){
     array[index/NUMBER_OF_BITS] ^= (1 << (index%NUMBER_OF_BITS));
+
+    fstream file;
+    file.open(DATA_FILE_NAME, ios::out | ios::binary);
+    if (!file.is_open()){
+        // signal to the user if the file coudn't be created
+        cout << "cannot open file" << DATA_FILE_NAME << endl;
+    }else{
+        // update bitmap in memory too
+        file.seekp(offset, ios::beg);
+        file.write(array, sizeof(array));
+    }
+    file.close();
+}
+
+void Bitmap::print_bytes_as_ints(){
+    for(int i =0; i<10; i++){
+        cout<<"Number "<<i<<":"<<(int)array[i]<<"!"<<endl;
+    }
 }
 
 Bitmap::~Bitmap(){
-    delete[] array;
+    //delete[] array;
 }
