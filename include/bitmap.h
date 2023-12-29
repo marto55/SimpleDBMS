@@ -1,5 +1,5 @@
-#ifndef BST_H
-#define BST_H
+#ifndef BMP_H
+#define BMP_H
 
 #include <cstdint>
 
@@ -17,5 +17,5 @@ public:
     ~Bitmap();
 };
 
-#endif // BST_H
+#endif // BMP_H
 

@@ -10,7 +10,7 @@ void Database::read_input(){
     while(true){
 
         // get input from user preferably in the form of valid query
-        // string command is 12 symbols since no valid command is longer than 12 symbols
+        // string command is 11 symbols since no valid command is longer than 11 symbols
         getline (cin, query);
         string command = "-----------";
 
@@ -55,7 +55,7 @@ void Database::read_input(){
 }
 
 void Database::create_table(){
-
+    
 }
 
 void Database::list_tables(){

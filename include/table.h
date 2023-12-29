@@ -2,6 +2,7 @@
 #define TBL_H
 
 class Table{
+    
 public:
 	
 };
