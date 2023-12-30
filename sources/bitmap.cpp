@@ -8,7 +8,7 @@ using namespace std;
 
 void Bitmap::init(char values[MEMORY_MAP_SIZE_IN_BYTES], int offs){
     offset = offs;
-    for(int i =0; i<10; i++){
+    for(int i =0; i<MEMORY_MAP_SIZE_IN_BYTES; i++){
         array[i] = values[i];
     }
 }
@@ -17,14 +17,14 @@ void Bitmap::set(int index){
     array[index/NUMBER_OF_BITS] |= (1 << (index%NUMBER_OF_BITS));
 
     fstream file;
-    file.open(DATA_FILE_NAME, ios::out | ios::binary);
+    file.open(DATA_FILE_NAME, ios::in | ios::out | ios::binary);
     if (!file.is_open()){
-        // signal to the user if the file coudn't be created
+        // signal to the user if the file coudn't be opened
         cout << "cannot open file" << DATA_FILE_NAME << endl;
     }else{
         // update bitmap in memory too
         file.seekp(offset, ios::beg);
-        file.write(array, sizeof(array));
+        file.write((char*)array, MEMORY_MAP_SIZE_IN_BYTES);
     }
     file.close();
 }
@@ -33,7 +33,7 @@ void Bitmap::reset(int index){
     array[index/NUMBER_OF_BITS] &= ~(1 << (index%NUMBER_OF_BITS));
 
     fstream file;
-    file.open(DATA_FILE_NAME, ios::out | ios::binary);
+    file.open(DATA_FILE_NAME, ios::in | ios::out | ios::binary);
     if (!file.is_open()){
         // signal to the user if the file coudn't be created
         cout << "cannot open file" << DATA_FILE_NAME << endl;
@@ -53,7 +53,7 @@ void Bitmap::flip(int index){
     array[index/NUMBER_OF_BITS] ^= (1 << (index%NUMBER_OF_BITS));
 
     fstream file;
-    file.open(DATA_FILE_NAME, ios::out | ios::binary);
+    file.open(DATA_FILE_NAME, ios::in | ios::out | ios::binary);
     if (!file.is_open()){
         // signal to the user if the file coudn't be created
         cout << "cannot open file" << DATA_FILE_NAME << endl;

@@ -5,8 +5,8 @@
 
 class Table{
 public:
-	char name[20];
-    char columns[ 10 * COLUMN_SIZE_IN_BYTES];
+	char name[STRING_SIZE];
+    char columns[ MAX_NUMBER_OF_COLUMNS * COLUMN_SIZE_IN_BYTES];
 };
 
 #endif // TBL_H
