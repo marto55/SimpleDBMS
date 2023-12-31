@@ -1,4 +1,5 @@
 #include "database.h"
+#include "table.h"
 #include "hash_functions.h"
 
 #include <iostream>
@@ -53,15 +54,15 @@ void Database::read_input(){
         getline (cin, query);
         string command;
 
-        // separate and save the first word of the input in the command variable
-        for(unsigned i = 0; i < query.size(); ++i) {
+        // separate and save the first word of the input query into the command variable
+        for(unsigned i = 0; i < query.size() && i<sizeof("CreateTable"); ++i) {
             if(query[i]==' '){
                 break;
             }
             command += query[i];
         }
 
-        // comapring the input command variable to the valid option and executing the apropriate function
+        // comapring the input command variable to the valid options and executing the apropriate function
         if(command == "CreateTable"){
             create_table();
             continue;
@@ -86,13 +87,89 @@ void Database::read_input(){
 
 void Database::create_table(){
 
+    // keep the number of the next character to read of the query
+    // 12 is the index after "CreateTable "
+    unsigned i = 12;
+
     // find and save the name ot the table
     string name;
-    for(unsigned i = sizeof("CreateTable"); i < query.size() && name.size()<STRING_SIZE; ++i) {
+    for(; i < query.size(); ++i) {
+        if(name.size()>=DATABASE_STRING_SIZE){
+            cout<<"table has too long name"<<endl;
+        }
         if(query[i]=='('){
             break;
         }
         name += query[i];
+    }
+    // check the validity of the command
+    if(query[i] != '(' || name.size()<=0){
+        cout<<"Wrong command"<<endl;
+        return;
+    }
+    // line of code to make i skip the "(" symbol
+    ++i;
+
+    // check if the brackets are empty
+    if(query[i] == ')'){
+        cout<<"Wrong command"<<endl;
+        return;
+    }
+    // determine and save the comumns' names and types
+    //Column columns[10];
+    for(int j=0; i < query.size() && query[i]!=')'; ++j){
+        string column_name;
+        string column_type;
+
+        for(; i < query.size(); ++i) {
+            if(name.size()>=DATABASE_STRING_SIZE){
+                cout<<"column has too long name"<<endl;
+            }
+            if(query[i]==':'){
+                break;
+            }
+            column_name += query[i];
+        }
+        // check the validity of the command
+        if(query[i] != ':' || column_name.size()<=0){
+            cout<<"Wrong command"<<endl;
+            return;
+        }
+        // line of code to make i skip the ":" symbol
+        ++i;
+
+        for(; i < query.size() && query[i]!=')'; ++i) {
+            if(query[i]==',' && query[i+1]==' '){
+                break;
+            }
+            column_type += query[i];
+        }
+
+        // check the validity of the command
+        if( (query[i] != ',' && query[i] != ')') || column_type.size()<=0){
+            cout<<"Wrong command"<<endl;
+            return;
+        }
+        // line of code to make i skip the ":" symbol
+        ++i;
+        ++i;
+
+        //cout<<"Column name: "<<column_name<<endl<<"Column type: "<<column_type<<endl;
+        //columns[0].init();
+
+        // if(column_type == "int"){
+        //     columns[j].init(column_name, 'i');
+        // }else{
+        //     if(column_type == "string"){
+        //         columns[j].init(column_name, 's');
+        //     }else{
+        //         if(column_type == "date"){
+        //             columns[j].init(column_name, 'd');
+        //         }else{
+        //             cout<<"wrong data type for column: "<<column_name<<endl;
+        //         }
+        //     }
+        // }
     }
 
     // find the first empty chunk of memory
@@ -107,11 +184,11 @@ void Database::create_table(){
             return;
         }
     }
+    // flag the chunk as used in the maps
     memory_chunks_map.set(first_empty_chunk);
     tables_map.set(first_empty_chunk);
 
-    // memory_chunks_map.print_bytes_as_ints();
-    // tables_map.print_bytes_as_ints();
+
 }
 
 void Database::list_tables(){
