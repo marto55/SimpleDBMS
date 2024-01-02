@@ -7,13 +7,14 @@
 
 using std::string;
 
-#define COLUMN_SIZE_IN_BYTES 21
+#define COLUMN_SIZE_IN_BYTES 41
 
 class Column{
     char name[DATABASE_STRING_SIZE];
 	char type;
+    char column_default[DATABASE_STRING_SIZE];
 public:
-    void init(string name, char type);
+    void init(string name, char type, string column_default);
 };
 
 #endif // COL_H

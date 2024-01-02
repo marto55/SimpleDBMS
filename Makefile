@@ -1,6 +1,6 @@
 # Great Makefile
 CC:= g++
-FLAGS:= -Iinclude -Wall -Wextra -pedantic -std=c++17
+FLAGS:= -Iinclude -g -Wall -Wextra -pedantic -std=c++17
 
 SRC:= sources/
 OBJ:= build/

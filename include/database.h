@@ -19,6 +19,7 @@ public:
 	Database();
 
 	void read_input();
+	bool check_date(string column_default);
 	void create_table();
 	void list_tables();
 	void drop_table();
