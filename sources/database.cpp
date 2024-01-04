@@ -19,11 +19,11 @@ Database::Database(){
             cout << "cannot create file" << DATA_FILE_NAME << endl;
         }else{
             // fill the first 20 bytes ( the bitmaps ) with zeros
-            char zeros[MEMORY_MAP_SIZE_IN_BYTES * 2] = {0};
-            file.write(zeros, MEMORY_MAP_SIZE_IN_BYTES * 2);
+            char zeros[MEMORY_MAP_SIZE * 2] = {0};
+            file.write(zeros, MEMORY_MAP_SIZE * 2);
             // init the memory maps in the program with 0s
             memory_chunks_map.init(zeros, 0);
-            tables_map.init(zeros, MEMORY_MAP_SIZE_IN_BYTES);
+            tables_map.init(zeros, MEMORY_MAP_SIZE);
         }
         file.close();
     }else{
@@ -35,13 +35,13 @@ Database::Database(){
             cout << "cannot open file" << DATA_FILE_NAME << endl;
         }else{
             // read first 20 bytes of the file and copy the bytes into the maps
-            char buffer[MEMORY_MAP_SIZE_IN_BYTES];
-            file.read( (char*) buffer, MEMORY_MAP_SIZE_IN_BYTES);
+            char buffer[MEMORY_MAP_SIZE];
+            file.read( (char*) buffer, MEMORY_MAP_SIZE);
             memory_chunks_map.init(buffer, 0);
 
-            char buffer2[MEMORY_MAP_SIZE_IN_BYTES];
-            file.read( (char*) buffer2, MEMORY_MAP_SIZE_IN_BYTES);
-            tables_map.init(buffer, MEMORY_MAP_SIZE_IN_BYTES);
+            char buffer2[MEMORY_MAP_SIZE];
+            file.read( (char*) buffer2, MEMORY_MAP_SIZE);
+            tables_map.init(buffer, MEMORY_MAP_SIZE);
         }
         file.close();
     }
@@ -123,5 +123,14 @@ bool Database::check_date(string date) {
     if (month == 4 || month == 6 || month == 9 || month == 11)
         return (day <= 30);
 
+    return true;
+}
+
+bool Database::check_default_int(const std::string& s)
+{
+    for(char const &c : s) {
+        if(c<'0' || '9'<c)
+            return false;
+    }
     return true;
 }

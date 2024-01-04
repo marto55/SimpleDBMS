@@ -6,9 +6,9 @@
 
 using namespace std;
 
-void Bitmap::init(char values[MEMORY_MAP_SIZE_IN_BYTES], int offs){
+void Bitmap::init(char values[MEMORY_MAP_SIZE], int offs){
     offset = offs;
-    for(int i =0; i<MEMORY_MAP_SIZE_IN_BYTES; i++){
+    for(int i =0; i<MEMORY_MAP_SIZE; i++){
         array[i] = values[i];
     }
 }
@@ -24,7 +24,7 @@ void Bitmap::set(int index){
     }else{
         // update bitmap in memory too
         file.seekp(offset, ios::beg);
-        file.write((char*)array, MEMORY_MAP_SIZE_IN_BYTES);
+        file.write((char*)array, MEMORY_MAP_SIZE);
     }
     file.close();
 }

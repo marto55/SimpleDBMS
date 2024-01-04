@@ -20,6 +20,7 @@ public:
 
 	void read_input();
 	bool check_date(string column_default);
+	bool check_default_int(const std::string& s);
 	void create_table();
 	void list_tables();
 	void drop_table();

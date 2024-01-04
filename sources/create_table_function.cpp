@@ -1,13 +1,12 @@
 #include <iostream>
+#include <fstream>
 #include <string>
+#include <cstring>
 
 #include "database.h"
 #include "column.h"
 
-using std::string;
-using std::cout;
-using std::cin;
-using std::endl;
+using namespace std;
 
 void Database::create_table(){
 
@@ -41,7 +40,8 @@ void Database::create_table(){
     }
     // determine and save the comumns' names and types
     Column columns[10];
-    for(int j=0; i < query.size() && query[i]!=')'; ++j){
+    int j=0;
+    for(; i < query.size() && query[i]!=')'; ++j){
         string column_name;
         string column_type;
         string column_default;
@@ -102,6 +102,9 @@ void Database::create_table(){
                             }
                             column_default += query[i];
                         }
+                    }else{
+                        cout<<"wrong default value"<<endl;
+                        return;
                     }
                 }
             }
@@ -117,6 +120,18 @@ void Database::create_table(){
             return;
         }
 
+        if( (query[i]==',' && query[i+1]==' ')){
+                ++i;
+                ++i;
+            }
+
+        if(column_type == "int" && column_default.size() > 0){
+            if(!check_default_int(column_default)){
+                cout<<"wrong default value"<<endl;
+                return;
+            }
+        }
+
         if(column_type == "date" && column_default.size() > 0){
             if(!check_date(column_default)){
                 cout<<"wrong date format"<<endl;
@@ -124,9 +139,7 @@ void Database::create_table(){
             }
         }
 
-        cout<<"Column name: "<<column_name<<endl<<"Column type: "<<column_type<<endl<<"Column default: "<<column_default<<endl;
-
-        
+        //cout<<"Column name: "<<column_name<<endl<<"Column type: "<<column_type<<endl<<"Column default: "<<column_default<<endl;
 
         if(column_type == "int"){
             columns[j].init(column_name, 'i', column_default);
@@ -159,6 +172,37 @@ void Database::create_table(){
     // flag the chunk as used in the maps
     memory_chunks_map.set(first_empty_chunk);
     tables_map.set(first_empty_chunk);
+
+    // save table in data file
+    ofstream fs;
+    fs.open(DATA_FILE_NAME, ios::out | ios::binary | ios::app);
+    if (!fs.is_open()){
+        cout << "cannot open file" << DATA_FILE_NAME << endl;
+    }
+    else{
+        char memory_chunk[CHUNK_SIZE];
+        memset(memory_chunk, 0, CHUNK_SIZE);
+
+        name.resize(DATABASE_STRING_SIZE, 0);
+        for(int k=0; k<DATABASE_STRING_SIZE; ++k){
+            memory_chunk[k]=name[k];
+        }
+
+        for(int l=0; l<j; ++l){
+            for(int k=0; k<DATABASE_STRING_SIZE; ++k){
+                memory_chunk[DATABASE_STRING_SIZE + l*COLUMN_SIZE + k] = columns[l].get_name()[k];
+            }
+            memory_chunk[DATABASE_STRING_SIZE + l*COLUMN_SIZE + DATABASE_STRING_SIZE] = columns[l].get_type();
+
+            for(int k=0; k<DATABASE_STRING_SIZE; ++k){
+                memory_chunk[DATABASE_STRING_SIZE + l*COLUMN_SIZE + DATABASE_STRING_SIZE + 1 + k] = columns[l].get_column_default()[k];
+            }
+        }
+
+        fs.seekp(MEMORY_MAP_SIZE*2 + first_empty_chunk*CHUNK_SIZE, ios::beg);
+        fs.write( (char*) &memory_chunk, sizeof(memory_chunk));
+    }
+    fs.close();
 
 
 }

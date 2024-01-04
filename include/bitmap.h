@@ -7,9 +7,9 @@
 class Bitmap{
 private:
     int offset;
-    char array[MEMORY_MAP_SIZE_IN_BYTES];
+    char array[MEMORY_MAP_SIZE];
 public:
-    void init(char values[MEMORY_MAP_SIZE_IN_BYTES], int offs);
+    void init(char values[MEMORY_MAP_SIZE], int offs);
     void set(int index);
     void reset(int index);
     bool test(int index);
