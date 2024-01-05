@@ -204,5 +204,42 @@ void Database::create_table(){
     }
     fs.close();
 
+}
 
+bool isLeap(int year) {
+    return (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
+}
+
+bool Database::check_date(string date) {
+
+    if (date.length() != 10 || date[2] != '.' || date[5] != '.')
+        return false;
+
+    int day = std::stoi(date.substr(0, 2));
+    int month = std::stoi(date.substr(3, 2));
+    int year = std::stoi(date.substr(6, 4));
+
+    if (year < 1583 || month < 1 || month > 12 || day < 1 || day > 31)
+        return false;
+
+    if (month == 2) {
+        if (isLeap(year))
+            return (day <= 29);
+        else
+            return (day <= 28);
+    }
+
+    if (month == 4 || month == 6 || month == 9 || month == 11)
+        return (day <= 30);
+
+    return true;
+}
+
+bool Database::check_default_int(const std::string& s)
+{
+    for(char const &c : s) {
+        if(c<'0' || '9'<c)
+            return false;
+    }
+    return true;
 }

@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include <string>
+#include <vector>
 
 using namespace std;
 
@@ -87,6 +88,37 @@ void Database::read_input(){
 
 void Database::list_tables(){
 
+    // create string to store the output
+    string table_names;
+
+    // if the file exist just read the first 20 bytes and allocate the bitmaps in the program
+    file.open(DATA_FILE_NAME, ios::in | ios::binary);
+    
+    // check if the file is open
+    if (!file.is_open()){
+        // signal to the user if the file coudn't be opened
+        cout << "cannot open file" << DATA_FILE_NAME << endl;
+    }else{
+        // if its open then read all the tables' names and write in the string table_names
+        // loop that goes through the bitmap
+        for(int i=0; i<MEMORY_MAP_SIZE*8; ++i){
+            if(tables_map.test(i)){
+
+                // if there is a table description in this chunk read the name (the first 20 bytes of the chunk)
+                char buffer[DATABASE_STRING_SIZE];
+                file.seekg(2*MEMORY_MAP_SIZE + i*CHUNK_SIZE, ios::beg);
+                file.read((char*) buffer, DATABASE_STRING_SIZE);
+                for(int j=0; j<DATABASE_STRING_SIZE; j++){
+                    table_names += buffer[j];
+                }
+                // add new line to make it readable in the console
+                table_names += '\n';
+            }
+        }
+    }
+    file.close();
+
+    cout<<table_names;
 }
 
 void Database::drop_table(){
@@ -95,42 +127,4 @@ void Database::drop_table(){
 
 void Database::table_info(){
 
-}
-
-bool isLeap(int year) {
-    return (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
-}
-
-bool Database::check_date(string date) {
-
-    if (date.length() != 10 || date[2] != ':' || date[5] != ':')
-        return false;
-
-    int day = std::stoi(date.substr(0, 2));
-    int month = std::stoi(date.substr(3, 2));
-    int year = std::stoi(date.substr(6, 4));
-
-    if (year < 1583 || month < 1 || month > 12 || day < 1 || day > 31)
-        return false;
-
-    if (month == 2) {
-        if (isLeap(year))
-            return (day <= 29);
-        else
-            return (day <= 28);
-    }
-
-    if (month == 4 || month == 6 || month == 9 || month == 11)
-        return (day <= 30);
-
-    return true;
-}
-
-bool Database::check_default_int(const std::string& s)
-{
-    for(char const &c : s) {
-        if(c<'0' || '9'<c)
-            return false;
-    }
-    return true;
 }
