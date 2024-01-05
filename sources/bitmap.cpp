@@ -35,12 +35,12 @@ void Bitmap::reset(int index){
     fstream file;
     file.open(DATA_FILE_NAME, ios::in | ios::out | ios::binary);
     if (!file.is_open()){
-        // signal to the user if the file coudn't be created
+        // signal to the user if the file coudn't be opened
         cout << "cannot open file" << DATA_FILE_NAME << endl;
     }else{
         // update bitmap in memory too
         file.seekp(offset, ios::beg);
-        file.write(array, sizeof(array));
+        file.write((char*)array, MEMORY_MAP_SIZE);
     }
     file.close();
 }

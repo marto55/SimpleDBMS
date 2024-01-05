@@ -10,7 +10,7 @@ using namespace std;
 
 void Database::create_table(){
 
-    // keep the number of the next character to read of the query
+    // keep the index of the next character to read of the query
     // 12 is the index after "CreateTable "
     unsigned i = 12;
 
@@ -169,25 +169,24 @@ void Database::create_table(){
             return;
         }
     }
-    // flag the chunk as used in the maps
-    memory_chunks_map.set(first_empty_chunk);
-    tables_map.set(first_empty_chunk);
 
     // save table in data file
-    ofstream fs;
-    fs.open(DATA_FILE_NAME, ios::out | ios::binary | ios::app);
-    if (!fs.is_open()){
+    file.open(DATA_FILE_NAME, ios::in | ios::out | ios::binary);
+    if (!file.is_open()){
         cout << "cannot open file" << DATA_FILE_NAME << endl;
     }
     else{
+        // create chunk of memory filled with '\0'
         char memory_chunk[CHUNK_SIZE];
         memset(memory_chunk, 0, CHUNK_SIZE);
 
+        // write name in the first 20 bytes
         name.resize(DATABASE_STRING_SIZE, 0);
         for(int k=0; k<DATABASE_STRING_SIZE; ++k){
             memory_chunk[k]=name[k];
         }
 
+        // write all the columns in the nest bytes
         for(int l=0; l<j; ++l){
             for(int k=0; k<DATABASE_STRING_SIZE; ++k){
                 memory_chunk[DATABASE_STRING_SIZE + l*COLUMN_SIZE + k] = columns[l].get_name()[k];
@@ -198,12 +197,15 @@ void Database::create_table(){
                 memory_chunk[DATABASE_STRING_SIZE + l*COLUMN_SIZE + DATABASE_STRING_SIZE + 1 + k] = columns[l].get_column_default()[k];
             }
         }
-
-        fs.seekp(MEMORY_MAP_SIZE*2 + first_empty_chunk*CHUNK_SIZE, ios::beg);
-        fs.write( (char*) &memory_chunk, sizeof(memory_chunk));
+        // write the chunk into the file
+        file.seekp(MEMORY_MAP_SIZE*2 + first_empty_chunk*CHUNK_SIZE, ios::beg);
+        file.write( (char*) &memory_chunk, sizeof(memory_chunk));
     }
-    fs.close();
+    file.close();
 
+    // flag the chunk as used in the maps
+    memory_chunks_map.set(first_empty_chunk);
+    tables_map.set(first_empty_chunk);
 }
 
 bool isLeap(int year) {
