@@ -126,13 +126,32 @@ void Database::create_table(){
                 ++i;
             }
 
-        if(column_type == "int" && column_default.size() > 0){
+        if(column_type == "int"){
             if(!check_default_int(column_default)){
                 cout<<"wrong default value"<<endl;
                 return;
             }
+            if(column_default.size()<=0){
+                column_default = "";
+                column_default += '\0';
+                column_default += '\0';
+                column_default += '\0';
+                column_default += '\0';
+                column_default += '0';
+            }else{
+                int num = stoi(column_default);
+                char byte_array[4];
+                byte_array[0] = (char)(num >> 24);
+                byte_array[1] = (char)(num >> 16);
+                byte_array[2] = (char)(num >> 8);
+                byte_array[3] = (char)num;
+                column_default = "";
+                column_default += byte_array[0];
+                column_default += byte_array[1];
+                column_default += byte_array[2];
+                column_default += byte_array[3];
+            }
         }
-
         if(column_type == "date" && column_default.size() > 0){
             if(!check_date(column_default)){
                 cout<<"wrong date format"<<endl;

@@ -12,6 +12,7 @@
 #define DEFAULT_DATE "01012000"
 #define COLUMN_SIZE 41
 #define CHUNK_SIZE 512
+#define INT_SIZE sizeof(int)
 
 
 #endif // CNS_H

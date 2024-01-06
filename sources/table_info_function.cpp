@@ -7,6 +7,7 @@
 using std::cout;
 using std::endl;
 using std::ios;
+using std::to_string;
 
 void Database::table_info(){
     // keep the index of the next character to read of the query
@@ -28,7 +29,6 @@ void Database::table_info(){
     }
 
     file.open(DATA_FILE_NAME, ios::in | ios::out | ios::binary);
-    
     // check if the file is open
     if (!file.is_open()){
         // signal to the user if the file coudn't be opened
@@ -84,19 +84,46 @@ void Database::table_info(){
                                 
                                 if(buffer[k]=='i'){
                                     table_info += string("int");
+                                    if(buffer[k+5]=='0'){
+                                        break;
+                                    }else{
+                                        char bytes[4] = {buffer[k+1], buffer[k+2], buffer[k+3], buffer[k+4]};
+                                        int value = (bytes[0] << 24) | (bytes[1] << 16) | (bytes[2] << 8) | bytes[3];
+                                        table_info += string("\t|\tdefault\t:\t");
+                                        table_info += to_string(value);
+                                        break;
+                                    }
                                 }
                                 if(buffer[k]=='s'){
                                     table_info += string("string");
+                                    if(buffer[k+1]==0){
+                                        break;
+                                    }else{
+                                        ++k;
+                                        table_info += string("\t|\tdefault\t:\t");
+                                    }
                                 }
                                 if(buffer[k]=='d'){
                                     table_info += string("date");
-                                }
+                                    if(buffer[k+1]==0){
+                                        break;
+                                    }else{
+                                        string value;
+                                        value+=buffer[k+1];
+                                        value+=buffer[k+2];
+                                        value+='.';
+                                        value+=buffer[k+3];
+                                        value+=buffer[k+4];
+                                        value+='.';
+                                        value+=buffer[k+5];
+                                        value+=buffer[k+6];
+                                        value+=buffer[k+7];
+                                        value+=buffer[k+8];
 
-                                if(buffer[k+1]==0){
-                                    break;
-                                }else{
-                                    ++k;
-                                    table_info += string("\t|\tdefault\t:\t");
+                                        table_info += string("\t|\tdefault\t:\t");
+                                        table_info += value;
+                                        break;
+                                    }
                                 }
                             }
                             table_info += buffer[k];
