@@ -39,7 +39,7 @@ void Database::create_table(){
         return;
     }
     // determine and save the comumns' names and types
-    Column columns[10];
+    Column columns[MAX_NUMBER_OF_COLUMNS];
     int j=0;
     for(; i < query.size() && query[i]!=')'; ++j){
         string column_name;
@@ -70,6 +70,7 @@ void Database::create_table(){
             // check if there is default for the column and save it
             if(query[i]==' ' && query[i+1]=='d' && query[i+2]=='e' && query[i+3]=='f' && 
             query[i+4]=='a' && query[i+5]=='u' && query[i+6]=='l' && query[i+7]=='t' && query[i+8]==' '){
+                
                 i+=9;
                 if(column_type == "int"){
                     for(; i < query.size(); ++i) {

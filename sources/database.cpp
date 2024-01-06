@@ -90,7 +90,6 @@ void Database::read_input(){
                 }
                 command += query[i];
             }
-            cout<<command<<endl;
             if(command == "Insert INTO"){
                 insert_into();
                 continue;
