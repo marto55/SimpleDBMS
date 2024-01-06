@@ -138,6 +138,16 @@ void Database::create_table(){
                 cout<<"wrong date format"<<endl;
                 return;
             }
+            string new_column_default;
+            new_column_default += column_default[0];
+            new_column_default += column_default[1];
+            new_column_default += column_default[3];
+            new_column_default += column_default[4];
+            new_column_default += column_default[6];
+            new_column_default += column_default[7];
+            new_column_default += column_default[8];
+            new_column_default += column_default[9];
+            column_default = new_column_default;
         }
 
         //cout<<"Column name: "<<column_name<<endl<<"Column type: "<<column_type<<endl<<"Column default: "<<column_default<<endl;
