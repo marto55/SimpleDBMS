@@ -81,6 +81,32 @@ void Database::read_input(){
             table_info();
             continue;
         }
+        if(command == "Insert"){
+            // check if next word is 'INTO'
+            command += ' ';
+            for(unsigned i = command.size(); i < query.size() && i<sizeof("Insert INTO"); ++i) {
+                if(query[i]==' '){
+                    break;
+                }
+                command += query[i];
+            }
+            cout<<command<<endl;
+            if(command == "Insert INTO"){
+                insert_into();
+                continue;
+            }else{
+                cout<<"Wrong command !"<<endl;
+                continue;
+            }
+        }
+        if(command == "Select"){
+            select();
+            continue;
+        }
+        if(command == "Delete"){
+            delete_function();
+            continue;
+        }
 
         // message to the user if there was no match for his input
         cout<<"Wrong command !"<<endl;

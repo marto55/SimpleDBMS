@@ -25,6 +25,9 @@ public:
 	void list_tables();
 	void drop_table();
 	void table_info();
+	void insert_into();
+	void select();
+	void delete_function();
 };
 
 #endif // DBA_H

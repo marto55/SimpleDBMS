@@ -11,7 +11,7 @@ using std::ios;
 
 void Database::drop_table(){
 
-    // keep the index of the next character to read of the query
+    // keep the index of the next character to read from the query
     // 10 is the index after "DropTable "
     unsigned i = 10;
 
