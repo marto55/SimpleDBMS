@@ -10,7 +10,6 @@ using std::cout;
 using std::endl;
 using std::ios;
 using std::vector;
-using std::to_string;
 
 void Database::insert_into(){
     // keep the index of the next character to read of the query
@@ -467,7 +466,32 @@ void Database::insert_into(){
 // Insert INTO oo (hajde, rd) VALUES (123, "12.12.2012")
 // Insert INTO oo (hajde, rd) VALUES (123, "12.12.2012")
 // Insert INTO oo (hajde, rd) VALUES (123, "12.12.2012")
+// Insert INTO oo (hajde, rd) VALUES (123, "12.12.2012")
 
+// Insert INTO hh (kk) VALUES (123)
+// Insert INTO hh (kk) VALUES (123)
+// Insert INTO hh (kk) VALUES (123)
+// Insert INTO hh (kk) VALUES (123)
+// Insert INTO hh (kk) VALUES (123)
+// Insert INTO hh (kk) VALUES (123)
+// Insert INTO hh (kk) VALUES (123)
+// Insert INTO hh (kk) VALUES (123)
+// Insert INTO hh (kk) VALUES (123)
+// Insert INTO hh (kk) VALUES (123)
+// Insert INTO hh (kk) VALUES (123)
+// Insert INTO hh (kk) VALUES (123)
+// Insert INTO hh (kk) VALUES (123)
+// Insert INTO hh (kk) VALUES (123)
+// Insert INTO hh (kk) VALUES (123)
+// Insert INTO hh (kk) VALUES (123)
+// Insert INTO hh (kk) VALUES (123)
+// Insert INTO hh (kk) VALUES (123)
+// Insert INTO hh (kk) VALUES (123)
+// Insert INTO hh (kk) VALUES (123)
+// Insert INTO hh (kk) VALUES (123)
+// Insert INTO hh (kk) VALUES (123)
+// Insert INTO hh (kk) VALUES (123)
+// Insert INTO hh (kk) VALUES (123)
 // Insert INTO hh (kk) VALUES (123)
 // Insert INTO hh (kk) VALUES (123)
 // Insert INTO hh (kk) VALUES (123)
