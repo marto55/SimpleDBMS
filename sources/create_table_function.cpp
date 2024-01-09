@@ -25,6 +25,43 @@ void Database::create_table(){
         }
         name += query[i];
     }
+
+    file.open(DATA_FILE_NAME, ios::in | ios::binary);
+    
+    // check if the file is open
+    if (!file.is_open()){
+        // signal to the user if the file coudn't be opened
+        cout << "cannot open file" << DATA_FILE_NAME << endl;
+    }else{
+        // if its open then read all the tables' names and write in the string table_names
+        // loop that goes through the bitmap
+        for(int i=0; i<MEMORY_MAP_SIZE*8; ++i){
+            if(tables_map.test(i)){
+
+                // if there is a table description in this chunk read the name (the first 20 bytes of the chunk)
+                char buffer[DATABASE_STRING_SIZE];
+                file.seekg(2*MEMORY_MAP_SIZE + i*CHUNK_SIZE, ios::beg);
+                file.read((char*) buffer, DATABASE_STRING_SIZE);
+
+                bool same = true;
+                string name2 = name;
+                name2.resize(DATABASE_STRING_SIZE, 0);
+                for(int j=0; j<DATABASE_STRING_SIZE; j++){
+                    if(name2[j] != buffer[j]){
+                        same = false;
+                        break;
+                    }
+                }
+                if(same){
+                    cout<<"table with this name already exists"<<endl;
+                    file.close();
+                    return;
+                }
+            }
+        }
+    }
+    file.close();
+
     // check the validity of the command
     if(query[i] != '(' || name.size()<=0){
         cout<<"Wrong command"<<endl;
