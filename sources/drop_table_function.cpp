@@ -77,7 +77,7 @@ void Database::drop_table(){
                         file.read((char *) buffer2, INT_SIZE);
 
                         file.seekp(MEMORY_MAP_SIZE*2 + next_chunk_index*CHUNK_SIZE, ios::beg);
-                        file.write( (char*) &empty_chunk, sizeof(empty_chunk));
+                        file.write( (char*) &empty_chunk, CHUNK_SIZE);
 
                         memory_chunks_map.reset(next_chunk_index);
 
@@ -86,7 +86,6 @@ void Database::drop_table(){
                             next_chunk_index = (next_chunk_index << 8) + (buffer2[k] & 0xff);
                         }
                     }
-
                     break;
                 }
             }
