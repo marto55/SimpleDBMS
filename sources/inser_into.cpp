@@ -104,9 +104,8 @@ void Database::insert_into(){
         return;
     }
 
-    bool found_table = false;
+    int table_chunk_index = -1;
     vector<Column> columns;
-    char next_chunk_number;
     file.open(DATA_FILE_NAME, ios::in | ios::out | ios::binary);
     // check if the file is open
     if (!file.is_open()){
@@ -119,12 +118,13 @@ void Database::insert_into(){
             if(tables_map.test(i)){
                 // if there is a table description in this chunk read the name (the first 20 bytes of the chunk) and write it in 'buffer'
                 char buffer[DATABASE_STRING_SIZE];
+
                 file.seekg(2*MEMORY_MAP_SIZE + i*CHUNK_SIZE, ios::beg);
                 file.read((char*) buffer, DATABASE_STRING_SIZE);
 
                 // if names match read all columns frpm the table description
                 if (name == string(buffer)){
-                    found_table = true;
+                    table_chunk_index = i;
 
                     // go through the columns of the table
                     for(int j=0; j<MAX_NUMBER_OF_COLUMNS; ++j){
@@ -191,10 +191,6 @@ void Database::insert_into(){
                         c.init(column_name, type, column_default);
                         columns.push_back(c);
                     }
-                    file.seekg(2*MEMORY_MAP_SIZE + (i+1)*CHUNK_SIZE - 1, ios::beg);
-                    char buffer3[1];
-                    file.read((char*) buffer3, 1);
-                    next_chunk_number = buffer3[0];
                     break;
                 }
             }
@@ -203,7 +199,7 @@ void Database::insert_into(){
     
     file.close();
 
-    if(!found_table){
+    if(table_chunk_index < 0){
         cout<<"no table with such name"<<endl;
         return;
     }
@@ -222,8 +218,7 @@ void Database::insert_into(){
     }
 
     int record_index = 0;
-    //char* record = new char[size_of_record];
-    char record[100];
+    char* record = new char[size_of_record];
     memset(record, 0, size_of_record);
     // loop that goes through all columns of the table in the file
     for(unsigned j=0; j<columns.size(); ++j){
@@ -281,44 +276,175 @@ void Database::insert_into(){
                 // loop that saves value in buffer
                 for(int l=0; l<size && record_index<size_of_record; ++l, ++record_index){
                     record[record_index] = values[k][l];
-                    cout<<values[k][l];
                 }
-                cout<<endl;
                 this_column_is_ready = true;
-            }else{
-                if(columns[j].get_column_default()){
-                    
-                }
             }
         }
         if(!this_column_is_ready){
-            cout<<"no value for column "<<columns[j].get_name()<<endl;
-            delete[] record;
-            return;
-        }
-    }
-    if(next_chunk_number == 0){
-        // find the first empty chunk of memory
-        int first_empty_chunk = 0;
-        while(true){
-            if(!memory_chunks_map.test(first_empty_chunk)){
-                break;
+            int size = 0;
+            if(columns[j].get_type() == 'i'){
+                if(columns[j].get_column_default()[5] != '0'){
+                    size = INT_SIZE;
+                }
             }
-            first_empty_chunk++;
-            if(first_empty_chunk>80){
-                cout<< "no more free chunks of memory"<<endl;
+            if(columns[j].get_type() == 's'){
+                if(columns[j].get_column_default()[0] != 0){
+                    size = DATABASE_STRING_SIZE;
+                }
+            }
+            if(columns[j].get_type() == 'd'){
+                if(columns[j].get_column_default()[0] != 0){
+                    size = DATE_SIZE;
+                }
+            }
+            if(size>0){
+                for(int l=0; l<size && record_index<size_of_record; ++l, ++record_index){
+                    record[record_index] = columns[j].get_column_default()[l];
+                }
+                this_column_is_ready = true;
+            }else{
+                cout<<"no value for column "<<columns[j].get_name()<<endl;
+                delete[] record;
                 return;
             }
         }
-
-        // next cunk = first empty chunk 
-
-        // write i*SIZE CHUNK - 1 next chunk
-    }else{
-        // go to next chunk
-
-        // find empty slot
     }
+    
+    file.open(DATA_FILE_NAME, ios::in | ios::out | ios::binary);
+    if (!file.is_open()){
+        cout << "cannot open file" << DATA_FILE_NAME << endl;
+    }
+    else{
+        int next_chunk_index;
+        char buffer[INT_SIZE];
+        file.seekg(2*MEMORY_MAP_SIZE + table_chunk_index*CHUNK_SIZE + CHUNK_SIZE-INT_SIZE, ios::beg);
+        file.read((char *) buffer, INT_SIZE);
+
+        // convert bytes into integer
+        for(int k = 0; k < 4; ++k) {
+            next_chunk_index = (next_chunk_index << 8) + (buffer[k] & 0xff);
+        }
+
+        if(next_chunk_index == 0){
+            // find the first empty chunk of memory
+            int first_empty_chunk = 0;
+            while(true){
+                if(!memory_chunks_map.test(first_empty_chunk)){
+                    break;
+                }
+                first_empty_chunk++;
+                if(first_empty_chunk>80){
+                    cout<< "no more free chunks of memory"<<endl;
+                    file.close();
+                    delete[] record;
+                    return;
+                }
+            }
+            next_chunk_index = first_empty_chunk;
+
+            char byte_array[4];
+            byte_array[0] = (char)(next_chunk_index >> 24);
+            byte_array[1] = (char)(next_chunk_index >> 16);
+            byte_array[2] = (char)(next_chunk_index >> 8);
+            byte_array[3] = (char)next_chunk_index;
+
+            file.seekp(2*MEMORY_MAP_SIZE + table_chunk_index*CHUNK_SIZE + CHUNK_SIZE-INT_SIZE, ios::beg);
+            file.write((char *) &byte_array, INT_SIZE);
+
+            char memory_chunk[CHUNK_SIZE];
+            memset(memory_chunk, 0, CHUNK_SIZE);
+            file.seekp(2*MEMORY_MAP_SIZE + next_chunk_index*CHUNK_SIZE, ios::beg);
+            file.write((char *) &memory_chunk, CHUNK_SIZE);
+
+            // update bitmap 
+            memory_chunks_map.set(next_chunk_index);
+        }
+
+        char memory_chunk[CHUNK_SIZE];
+        file.seekg(2*MEMORY_MAP_SIZE + next_chunk_index*CHUNK_SIZE, ios::beg);
+        file.read((char *) &memory_chunk, CHUNK_SIZE);
+
+        bool found_empty = false;
+        for(int j=0; !found_empty; ++j){
+            found_empty = true;
+
+            // see if space is empty
+            for(int k=0; k<size_of_record; ++k){
+                if((unsigned)((j+1)*size_of_record) > CHUNK_SIZE-INT_SIZE){
+                    found_empty = false;
+                    break;
+                }
+                if(memory_chunk[j*size_of_record + k] != 0){
+                    found_empty = false;
+                    break;
+                }
+            }
+            // if its empty write record in it
+            if(found_empty){
+                for(int k=0; k<size_of_record; ++k){
+                    memory_chunk[j*size_of_record + k] = record[k];
+                }
+                file.seekp(2*MEMORY_MAP_SIZE + next_chunk_index*CHUNK_SIZE, ios::beg);
+                file.write((char *) &memory_chunk, CHUNK_SIZE);
+            }
+            // if its not empty and the chunk is full go to next linked chunk or find next empty chunk and link it to the current one
+            if(!found_empty && (unsigned)(j+1)*size_of_record > CHUNK_SIZE-INT_SIZE){
+
+                // see if current chunk is linked to another 
+                int next_next_chunk_index;
+                char buffer[INT_SIZE];
+                file.seekg(2*MEMORY_MAP_SIZE + next_chunk_index*CHUNK_SIZE + CHUNK_SIZE-INT_SIZE, ios::beg);
+                file.read((char *) buffer, INT_SIZE);
+                // convert bytes into integer
+                for(int k = 0; k < 4; ++k) {
+                    next_next_chunk_index = (next_next_chunk_index << 8) + (buffer[k] & 0xff);
+                }
+                // if its linked go there
+                if(next_next_chunk_index > 0){
+                    next_chunk_index = next_next_chunk_index;
+
+                    file.seekg(2*MEMORY_MAP_SIZE + next_chunk_index*CHUNK_SIZE, ios::beg);
+                    file.read((char *) &memory_chunk, CHUNK_SIZE);
+                }else{
+                    // if its not linked to another find empty chunk and link them
+
+                    // find the first empty chunk of memory
+                    int first_empty_chunk = 0;
+                    while(true){
+                        if(!memory_chunks_map.test(first_empty_chunk)){
+                            break;
+                        }
+                        first_empty_chunk++;
+                        if(first_empty_chunk>80){
+                            cout<< "no more free chunks of memory"<<endl;
+                            file.close();
+                            delete[] record;
+                            return;
+                        }
+                    }
+                    char byte_array[4];
+                    byte_array[0] = (char)(first_empty_chunk >> 24);
+                    byte_array[1] = (char)(first_empty_chunk >> 16);
+                    byte_array[2] = (char)(first_empty_chunk >> 8);
+                    byte_array[3] = (char)first_empty_chunk;
+
+                    file.seekp(2*MEMORY_MAP_SIZE + next_chunk_index*CHUNK_SIZE + CHUNK_SIZE-INT_SIZE, ios::beg);
+                    file.write((char *) &byte_array, INT_SIZE);
+
+                    next_chunk_index = first_empty_chunk;
+
+                    memset(memory_chunk, 0, CHUNK_SIZE);
+                    file.seekp(2*MEMORY_MAP_SIZE + next_chunk_index*CHUNK_SIZE, ios::beg);
+                    file.write((char *) &memory_chunk, CHUNK_SIZE);
+
+                    // update bitmap 
+                    memory_chunks_map.set(next_chunk_index);
+                }
+                j=-1;
+            }
+        }
+    }
+    file.close();
     
     delete[] record;
 }

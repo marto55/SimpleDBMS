@@ -88,7 +88,11 @@ void Database::table_info(){
                                         break;
                                     }else{
                                         char bytes[4] = {buffer[k+1], buffer[k+2], buffer[k+3], buffer[k+4]};
-                                        int value = (bytes[0] << 24) | (bytes[1] << 16) | (bytes[2] << 8) | bytes[3];
+                                        int value = 0;
+
+                                        for(int i = 0; i < 4; ++i) {
+                                            value = (value << 8) + (bytes[i] & 0xff);
+                                        }
                                         table_info += string("\t|\tdefault\t:\t");
                                         table_info += to_string(value);
                                         break;

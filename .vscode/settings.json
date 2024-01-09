@@ -43,7 +43,8 @@
         "typeinfo": "cpp",
         "chrono": "cpp",
         "ratio": "cpp",
-        "scoped_allocator": "cpp"
+        "scoped_allocator": "cpp",
+        "regex": "cpp"
     },
     "C_Cpp.errorSquiggles": "enabled",
     "C_Cpp.default.enableConfigurationSquiggles": true

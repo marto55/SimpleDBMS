@@ -14,6 +14,7 @@ Database::Database(){
     // test to see if the file data.dat exists
     fstream test_file(DATA_FILE_NAME);
     if (!test_file.is_open()) {
+        test_file.close();
         // if the file doesnt exist : try to create it and fill the first 20 bytes with zeroes since the bitmaps are empty
         file.open(DATA_FILE_NAME, ios::out | ios::binary);
         if (!file.is_open()){
@@ -43,7 +44,7 @@ Database::Database(){
 
             char buffer2[MEMORY_MAP_SIZE];
             file.read( (char*) buffer2, MEMORY_MAP_SIZE);
-            tables_map.init(buffer, MEMORY_MAP_SIZE);
+            tables_map.init(buffer2, MEMORY_MAP_SIZE);
         }
         file.close();
     }
