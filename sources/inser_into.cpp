@@ -449,8 +449,6 @@ void Database::insert_into(){
     delete[] record;
 }
 
-
-
 // CreateTable hh(kk:int default 0)
 // CreateTable oo(hajde:int default 8191, ime:string default "ivan", rd:date)
 // CreateTable date(date:date default "01.01.2001")

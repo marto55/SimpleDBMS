@@ -53,6 +53,16 @@ void Database::drop_table(){
                 // if names match delete current memory chunk (empty it / fill with '\0')
                 if (name == string(buffer)){
                     found_table = true;
+
+                    int next_chunk_index;
+                    char buffer2[INT_SIZE];
+                    file.seekg(2*MEMORY_MAP_SIZE + i*CHUNK_SIZE + CHUNK_SIZE-INT_SIZE, ios::beg);
+                    file.read((char *) buffer2, INT_SIZE);
+                    // convert bytes into integer
+                    for(int k = 0; k < 4; ++k) {
+                        next_chunk_index = (next_chunk_index << 8) + (buffer2[k] & 0xff);
+                    }
+
                     char empty_chunk[CHUNK_SIZE];
                     memset(empty_chunk, 0, CHUNK_SIZE);
                     // write the chunk into the file
@@ -61,6 +71,23 @@ void Database::drop_table(){
 
                     memory_chunks_map.reset(i);
                     tables_map.reset(i);
+
+                    while(next_chunk_index > 0){
+                        file.seekg(2*MEMORY_MAP_SIZE + next_chunk_index*CHUNK_SIZE + CHUNK_SIZE-INT_SIZE, ios::beg);
+                        file.read((char *) buffer2, INT_SIZE);
+
+                        file.seekp(MEMORY_MAP_SIZE*2 + next_chunk_index*CHUNK_SIZE, ios::beg);
+                        file.write( (char*) &empty_chunk, sizeof(empty_chunk));
+
+                        memory_chunks_map.reset(next_chunk_index);
+
+                        // convert bytes into integer
+                        for(int k = 0; k < 4; ++k) {
+                            next_chunk_index = (next_chunk_index << 8) + (buffer2[k] & 0xff);
+                        }
+                    }
+
+                    break;
                 }
             }
         }
